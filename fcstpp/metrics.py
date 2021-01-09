@@ -108,4 +108,24 @@ def CRPS_2d(y_true, y_ens, land_mask='none'):
 
     return CRPS, MAE, SPREAD
 
+@nb.njit(fastmath=True)
+def BS_binary_1d(y_true, y_ens):
+    '''
+    
+    '''
+    
+    N_days, EN, N_grids = y_ens.shape
+    
+    # allocation
+    BS = np.empty((N_days, N_grids))
 
+    # loop over initialization days
+    for day in range(N_days):
+
+        ens_vector = y_ens[day, ...]
+        obs_vector = y_true[day, :]
+
+        for n in range(N_grids):
+            BS[day, n] = (obs_vector[n] - np.sum(ens_vector[:, n])/EN)**2
+
+    return BS
