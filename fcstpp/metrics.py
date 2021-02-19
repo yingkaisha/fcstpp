@@ -7,6 +7,7 @@ from fcstpp.utils import *
 @nb.njit(fastmath=True)
 def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
     '''
+    (experimental)
     Given quantile bins and values, compute CRPS based on determinstic obs.
     
     Input

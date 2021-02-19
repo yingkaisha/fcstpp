@@ -59,6 +59,7 @@ def schaake_shuffle(fcst, traj):
 @nb.njit(fastmath=True)
 def quantile_mapping_stencil(pred, cdf_pred, cdf_true, land_mask, rad=1):
     '''
+    (experimental)
     Quantile mapping with stencil grid points.
     
     quantile_mapping_stencil(pred, cdf_pred, cdf_true, land_mask, rad=1)

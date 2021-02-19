@@ -4,6 +4,7 @@ import numpy as np
 @nb.njit(fastmath=True)
 def window_slider_cycled_1d(ind, ind_total_length, ind_radius):
     '''
+    (experimental)
     window_slider_cycled_1d(ind, ind_total_length, ind_radius)
     
     Given an index, search its cyclied indices within a sliding window.
@@ -45,8 +46,9 @@ def window_slider_cycled_1d(ind, ind_total_length, ind_radius):
 @nb.njit(fastmath=True)
 def climate_subdaily_prob(climate_tuple, day_window, period=24):
     '''
+    (experimental)
     Given a tuple of historical daily binary observations, 
-    compute climatological probabilities of each day with
+    compute climatological probabilities of each day within
     a day window.
     
     Input
@@ -147,6 +149,7 @@ def climate_subdaily_prob(climate_tuple, day_window, period=24):
 
 def facet(Z, rad=1):
     '''
+    (experimental)
     Compute terrain facet based on elevation.
     Returned values are: {0, 1, 2, 3, 4, 5, 6, 7, 8}.
     Corresponed facet groups are: {"N", "NE", "E", "SE", "S", "SW", "W", "NW", "flat"}.
