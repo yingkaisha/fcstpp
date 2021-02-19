@@ -27,3 +27,7 @@ A collection of ensemble forecast post-processing functions.
 # Contact
 
 Yingkai (Kyle) Sha <<yingkai@eoas.ubc.ca>> <<yingkaisha@gmail.com>>
+
+# License
+
+[MIT License](https://github.com/yingkaisha/fcstpp/blob/main/LICENSE)
