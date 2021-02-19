@@ -5,6 +5,51 @@ import numpy as np
 from fcstpp.utils import *
 
 @nb.njit(fastmath=True)
+def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
+    '''
+    Given quantile bins and values, compute CRPS based on determinstic obs.
+    
+    Input
+    ----------
+        q_bins: quantile bins. `shape=(num_bins,)`.
+        CDFs: quantile values corresponded to the `q_bins`.
+              `shape=(num_bins, grid_points)`.
+        y_true: determinstic true values. `shape=(obs_time, grid_points)`.
+        
+    Output
+    ----------
+        CRPS
+        
+    * `q_bins` must be equally spaced.
+    * `y_true` is 2-d. That said, one CDF paired for multiple obs.
+      This is commonly applied for climatology CDFs vs. real-time obs. 
+    
+    '''
+    
+    L = len(q_bins)-1
+    H_func = np.zeros((L+1,))
+    d_bins = q_bins[1] - q_bins[0]
+    
+    N_days, N_grids = y_true.shape
+    
+    CRPS = np.empty((N_days, N_grids))
+    
+    for day in range(N_days):
+        for n in range(N_grids):
+            
+            cdf = CDFs[:, n]
+            obs = y_true[day, n]    
+            step = np.searchsorted(cdf, obs)
+            if step > L: step = L
+                
+            H_func[:] = 0.0
+            H_func[step:] = 1.0
+
+            CRPS[day, n] = np.sum(0.01*np.abs(q_bins-H_func))
+    
+    return CRPS
+
+@nb.njit(fastmath=True)
 def CRPS_1d(y_true, y_ens):
     '''
     Given one-dimensional ensemble forecast, compute its CRPS and corresponded two-term decomposition.
@@ -165,6 +210,24 @@ def CRPS_1d_nan(y_true, y_ens):
 @nb.njit(fastmath=True)
 def BS_binary_1d(y_true, y_ens):
     '''
+    Brier Score.
+    
+    BS_binary_1d(y_true, y_ens)
+    
+    ----------
+    Hamill, T.M. and Juras, J., 2006. Measuring forecast skill: Is it real skill 
+    or is it the varying climatology?. Quarterly Journal of the Royal Meteorological Society: 
+    A journal of the atmospheric sciences, applied meteorology and physical oceanography, 132(621C), pp.2905-2923.
+    
+    Input
+    ----------
+        y_true: determinstic and binary true values. `shape=(obs_time, grid_points)`.
+        y_ens: ensemble forecast. `shape=(time, ensemble_memeber, gird_points)`.
+        
+    Output
+    ----------
+        BS: Brier Score as described in Hamill and Juras (2006). 
+        i.e., not scaled by `ensemble_memeber`, so can be applied for spatial-averaged analysis.
     
     '''
     

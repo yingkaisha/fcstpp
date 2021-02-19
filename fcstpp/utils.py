@@ -144,3 +144,158 @@ def climate_subdaily_prob(climate_tuple, day_window, period=24):
     prob_out = temp_storage
     N_sample = temp_aug_num
     return prob_out, N_sample
+
+def facet(Z, rad=1):
+    '''
+    Compute terrain facet based on elevation.
+    Returned values are: {0, 1, 2, 3, 4, 5, 6, 7, 8}.
+    Corresponed facet groups are: {"N", "NE", "E", "SE", "S", "SW", "W", "NW", "flat"}.
+    
+    facet(Z, rad=1)
+    
+    ----------
+    Daly, C., Gibson, W.P., Taylor, G.H., Johnson, G.L. and Pasteris, P., 2002. 
+    A knowledge-based approach to the statistical mapping of climate. Climate research, 22(2), pp.99-113.
+    
+    Gibson, W., Daly, C. and Taylor, G., 1997. 7.1 DERIVATION OF FACET GRIDS FOR USE WITH THE PRISM MODEL.
+    
+    Input
+    ----------
+        Z: elevation. `shape=(grid x, gridy)`.
+        rad: the "rad" in Gibson et al. (1997). Larger is smoother.
+             (spatially more consistent facet groups).
+    
+    Output
+    ---------
+        out: facet groups.
+    
+    '''
+    dZy, dZx = np.gradient(Z)
+    dZy = -1*dZy
+    dZx = -1*dZx
+    Z_to_deg = np.arctan2(dZx, dZy)/np.pi*180
+    Z_to_deg[Z_to_deg<0] += 360
+    Z_ind = np.round(Z_to_deg/45.0)
+
+    thres = np.sqrt(dZy**2+dZx**2) < 0.1
+    Z_ind[thres] = 8
+    Z_ind = Z_ind.astype(int)
+
+    return facet_group(Z_ind, rad=rad)
+
+def facet_group(compass, rad):
+    '''
+    The Gibson et al. (1997) facet grouping scheme.
+    '''
+    thres = rad*4
+    grid_shape = compass.shape
+    compass_pad = np.pad(compass, 2, constant_values=999)
+    
+    out = np.empty(grid_shape)
+    
+    for i in range(grid_shape[0]):
+        for j in range(grid_shape[1]):
+            group = compass_pad[i-rad:i+rad+1, j-rad:j+rad+1].ravel()
+            flag_clean = ~(group==999)
+            if np.sum(flag_clean)<thres:
+                out[i, j] = np.nan
+            else:
+                group_clean = group[flag_clean]
+                out[i, j] = Gibbs_rule(group_clean)
+    return out
+            
+def adjacent(x1, x2):
+    diffx = np.abs(x1 - x2)
+    return np.min(np.array([diffx, np.abs(diffx+8), np.abs(diffx-8)]))
+
+def sum_adjacent(counts, n0):
+    n0_left = n0-1
+    if n0_left < 0:
+        n0_left += 8
+    n0_right = n0+1
+    if n0_right > 7:
+        n0_right -= 8
+    return np.max(np.array([counts[n0]+counts[n0_left], counts[n0]+counts[n0_right]])) 
+
+def Gibbs_rule(compass_vec):
+    '''
+    The Gibbs et al. (1997) facet grouping decision tree.
+    '''
+    L = len(compass_vec)
+    counts = np.bincount(compass_vec, minlength=9)
+    count_sort = np.argsort(counts)[::-1]
+    
+    no0 = count_sort[0]
+    no1 = count_sort[1]
+    no2 = count_sort[2]
+    no3 = count_sort[3]
+    
+    num_no0 = counts[no0]
+    num_no1 = counts[no1]
+    num_no2 = counts[no2]
+    num_no3 = counts[no3]
+
+    sum_no0 = sum_adjacent(counts, no0)
+    sum_no1 = sum_adjacent(counts, no1)
+    
+    # 1 + 2 > 50%
+    if num_no0 + num_no1 > 0.5*L:
+        # 1-2 >= 20%, or 1, 2, 3 flat, or 1 adj to 2, 3
+        if num_no0-num_no1 >= 0.2*L \
+        or no0 == 8 or no1 == 8 or no2 == 8 \
+        or adjacent(no0, no1) == 1 or adjacent(no0, no2) == 1:
+            return no0
+        else:
+            # 1 not adj to 2 or 3, and 2 not adj to 3
+            if adjacent(no0, no1) > 1 and adjacent(no0, no2) > 1 and adjacent(no1, no2) > 1:
+                return no0
+            else:
+                # 1 adj to 4, 2 adj to 3
+                if adjacent(no0, no3) == 1 and adjacent(no1, no2) == 1:
+                    if num_no2-num_no3 <= 0.1*L:
+                        if num_no0+num_no3 > num_no1+num_no2:
+                            return no0
+                        else:
+                            return no1
+                    else:
+                        if num_no1 + num_no2 > num_no0:
+                            return no1
+                        else:
+                            return no0
+                else:
+                    # 2 adj to 3
+                    if adjacent(no1, no2) == 1:
+                        if num_no1 + num_no2 > num_no0:
+                            return no1
+                        else:
+                            return no0
+                    else:
+                        # impossible
+                        return acdabbfatsh
+    else:
+        # 1 adj to 2, 1 not flat, 2 not flat
+        if adjacent(no0, no1) == 1 and no0 != 8 and no1 != 8:
+            return no0
+        else:
+            # 1 not adj to 2, 1 not flat, 2 not flat
+            if no0 != 8 and no1 != 8 and adjacent(no0, no1) > 1:
+                if sum_no0 > sum_no1:
+                    return no0
+                else:
+                    return no1
+            else:
+                if no0 == 8 or no1 == 8:
+                    # 1 is flat
+                    if no0 == 8:
+                        if sum_no1 > num_no0:
+                            return no1
+                        else:
+                            return no0
+                    else:
+                        if num_no0 >= num_no1:
+                            return no0
+                        else:
+                            return no1
+                else:
+                    # impossible
+                    return afegdagt
