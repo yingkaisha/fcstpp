@@ -11,7 +11,7 @@ A collection of ensemble forecast post-processing functions.
 | `fcstpp.metrics`| Usage | Reference |
 |:------------------|:--------------------------|:----------------|
 | `CRPS_1d` | CRPS and its two-term decomposition for 1-d ensembles | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
-| `CRPS_1d_nan`| similar to `CRPS_1d` but ignores np.nan elements | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
+| `CRPS_1d_nan`| Similar to `CRPS_1d` but ignores np.nan elements | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
 | `CRPS_2d` | CRPS and its two-term decomposition for 2-d ensembles | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
 | `CRPS_1d_from_quantiles` | Compute CRPS from quantile values | |
 | `BS_binary_1d` | Brier Score for 1-d ensembles | [Hamill and Juras (2006)](https://doi.org/10.1256/qj.06.25) |
