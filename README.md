@@ -12,7 +12,7 @@ A collection of ensemble forecast post-processing functions.
 |:------------------|:--------------------------|:----------------|
 | `CRPS_1d` | CRPS and its two-term decomposition for 1-d ensembles | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
 | `CRPS_1d_nan`| Similar to `CRPS_1d` but ignores np.nan elements | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
-| `CRPS_2d` | CRPS and its two-term decomposition for 2-d ensembles | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
+| `CRPS_2d` | CRPS and its two-term decompositions for 2-d ensembles | [Grimit et al. (2006)](https://doi.org/10.1256/qj.05.235) |
 | `CRPS_1d_from_quantiles` | Compute CRPS from quantile values | |
 | `BS_binary_1d` | Brier Score for 1-d ensembles | [Hamill and Juras (2006)](https://doi.org/10.1256/qj.06.25) |
 
@@ -20,7 +20,7 @@ A collection of ensemble forecast post-processing functions.
 | `fcstpp.utils`| Usage | Reference |
 |:------------------|:--------------------------|:----------------|
 | `window_slider_cycled_1d` | Given an index, search its cyclied indices within a sliding window | |
-| `climate_subdaily_prob`| compute climatological probabilities from a time window | |
+| `climate_subdaily_prob`| Compute climatological probabilities from a time window | |
 | `facet`| Compute terrain facet from gridded elevation| [Daly et al. (2002)](https://www.int-res.com/abstracts/cr/v22/n2/p99-113) |
 
 
