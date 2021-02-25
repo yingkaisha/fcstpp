@@ -1,7 +1,7 @@
 import numba as nb
 import numpy as np
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def window_slider_cycled_1d(ind, ind_total_length, ind_radius):
     '''
     (experimental)
@@ -43,7 +43,7 @@ def window_slider_cycled_1d(ind, ind_total_length, ind_radius):
         
     return ind_out
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def climate_subdaily_prob(climate_tuple, day_window, period=24):
     '''
     (experimental)

@@ -4,7 +4,7 @@ import numpy as np
 
 from fcstpp.utils import *
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
     '''
     (experimental)
@@ -50,7 +50,7 @@ def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
     
     return CRPS
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def CRPS_1d(y_true, y_ens):
     '''
     Given one-dimensional ensemble forecast, compute its CRPS and corresponded two-term decomposition.
@@ -97,8 +97,8 @@ def CRPS_1d(y_true, y_ens):
     
     return CRPS, MAE, SPREAD
 
-@nb.njit(fastmath=True)
-def CRPS_2d(y_true, y_ens, land_mask='none'):
+@nb.njit()
+def CRPS_2d(y_true, y_ens, land_mask=None):
     
     '''
     Given two-dimensional ensemble forecast, compute its CRPS and corresponded two-term decomposition.
@@ -129,8 +129,10 @@ def CRPS_2d(y_true, y_ens, land_mask='none'):
     N_day, EN, Nx, Ny = y_ens.shape
     M = 2*EN*EN
     
-    if land_mask == 'none':
-        land_mask = np.ones((Nx, Ny)) > 0
+    if land_mask is None:
+        land_mask_ = np.ones((Nx, Ny)) > 0
+    else:
+        land_mask_ = land_mask
     
     # allocate outputs
     MAE = np.empty((N_day, Nx, Ny),); MAE[...] = np.nan
@@ -139,7 +141,7 @@ def CRPS_2d(y_true, y_ens, land_mask='none'):
     # loop over grid points
     for i in range(Nx):
         for j in range(Ny):
-            if land_mask[i, j]:
+            if land_mask_[i, j]:
                 # loop over days
                 for day in range(N_day):
                     # calc MAE
@@ -154,7 +156,7 @@ def CRPS_2d(y_true, y_ens, land_mask='none'):
 
     return CRPS, MAE, SPREAD
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def CRPS_1d_nan(y_true, y_ens):
     '''
     Given one-dimensional ensemble forecast, compute its CRPS and corresponded two-term decomposition.
@@ -208,7 +210,7 @@ def CRPS_1d_nan(y_true, y_ens):
 
 
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def BS_binary_1d(y_true, y_ens):
     '''
     Brier Score.

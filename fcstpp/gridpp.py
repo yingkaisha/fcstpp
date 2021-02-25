@@ -2,14 +2,14 @@
 import numba as nb
 import numpy as np
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def _simple_max(a, b):
     if a >= b:
         return a
     else:
         return b
 
-@nb.njit(fastmath=True)
+@nb.njit()
 def _simple_min(a, b):
     if a <= b:
         return a
@@ -17,7 +17,7 @@ def _simple_min(a, b):
         return b
     
     
-@nb.njit(fastmath=True)
+@nb.njit()
 def schaake_shuffle(fcst, traj):
     '''
     Schaake shuffle.
@@ -56,7 +56,7 @@ def schaake_shuffle(fcst, traj):
     return output
     
     
-@nb.njit(fastmath=True)
+@nb.njit()
 def quantile_mapping_stencil(pred, cdf_pred, cdf_true, land_mask, rad=1):
     '''
     (experimental)
