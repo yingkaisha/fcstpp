@@ -1,8 +1,19 @@
 
 import numba as nb
 import numpy as np
+from sklearn.metrics import confusion_matrix
 
 from fcstpp.utils import *
+
+
+def ETS(TRUE, PRED):
+    TN, FP, FN, TP = confusion_matrix(TRUE, PRED).ravel()
+    TP_rnd = (TP+FN)*(TP+FP)/(TN+FP+FN+TP)
+    return (TP-TP_rnd)/(TP+FN+FP-TP_rnd)
+
+def freq_bias(TRUE, PRED):
+    TN, FP, FN, TP = confusion_matrix(TRUE, PRED).ravel()
+    return (TP+FP)/(TP+FN)
 
 @nb.njit()
 def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
