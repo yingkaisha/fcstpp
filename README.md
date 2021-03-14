@@ -19,6 +19,7 @@ A collection of ensemble forecast post-processing functions.
 
 | `fcstpp.utils`| Usage | Reference |
 |:------------------|:--------------------------|:----------------|
+| `score_bootstrap_1d`| Bootstrap the last dimension of an array | |
 | `window_slider_cycled_1d` | Given an index, search its cyclied indices within a sliding window | |
 | `climate_subdaily_prob`| Compute climatological probabilities from a time window | |
 | `facet`| Compute terrain facet from gridded elevation| [Daly et al. (2002)](https://www.int-res.com/abstracts/cr/v22/n2/p99-113) |
