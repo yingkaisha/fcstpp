@@ -16,30 +16,6 @@ def freq_bias(TRUE, PRED):
     return (TP+FP)/(TP+FN)
 
 @nb.njit()
-def score_bootstrap_1d(data, bootstrap_n=100):
-    '''
-    Bootstrapping the last dimension of a metric array.
-    '''
-    
-    dim = data.shape[-1]
-    temp = np.empty((dim, bootstrap_n))
-
-    for i in range(dim):
-        
-        raw = data[..., i].ravel()
-        flag_nan = np.logical_not(np.isnan(raw))
-        raw = raw[flag_nan]
-        L = np.sum(flag_nan)
-        
-        # bootstrap cycles
-        for b in range(bootstrap_n):
-            
-            ind_bagging = np.random.choice(L, size=L, replace=True)
-            temp[i, b] = np.mean(raw[ind_bagging])
-            
-    return temp
-
-@nb.njit()
 def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
     '''
     (experimental)
