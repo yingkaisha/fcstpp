@@ -171,6 +171,7 @@ def CRPS_2d(y_true, y_ens, land_mask=None):
 def CRPS_1d_nan(y_true, y_ens):
     '''
     Given one-dimensional ensemble forecast, compute its CRPS and corresponded two-term decomposition.
+    np.nan will not propagate.
     
     CRPS, MAE, pairwise_abs_diff = CRPS_1d(y_true, y_ens)
     
@@ -258,5 +259,48 @@ def BS_binary_1d(y_true, y_ens):
 
         for n in range(N_grids):
             BS[day, n] = (obs_vector[n] - np.sum(ens_vector[:, n])/EN)**2
+
+    return BS
+
+@nb.njit()
+def BS_binary_1d_nan(y_true, y_ens):
+    '''
+    Brier Score. np.nan will not propagate.
+    
+    BS_binary_1d_nan(y_true, y_ens)
+    
+    ----------
+    Hamill, T.M. and Juras, J., 2006. Measuring forecast skill: Is it real skill 
+    or is it the varying climatology?. Quarterly Journal of the Royal Meteorological Society: 
+    A journal of the atmospheric sciences, applied meteorology and physical oceanography, 132(621C), pp.2905-2923.
+    
+    Input
+    ----------
+        y_true: determinstic and binary true values. `shape=(obs_time, grid_points)`.
+        y_ens: ensemble forecast. `shape=(time, ensemble_memeber, gird_points)`.
+        
+    Output
+    ----------
+        BS: Brier Score as described in Hamill and Juras (2006). 
+        i.e., not scaled by `ensemble_memeber`, so can be applied for spatial-averaged analysis.
+    
+    '''
+    
+    N_days, EN, N_grids = y_ens.shape
+    
+    # allocation
+    BS = np.empty((N_days, N_grids))
+
+    # loop over initialization days
+    for day in range(N_days):
+
+        ens_vector = y_ens[day, ...]
+        obs_vector = y_true[day, :]
+
+        for n in range(N_grids):
+            if np.isnan(obs_vector[n]):
+                BS[day, n] = np.nan
+            else:
+                BS[day, n] = (obs_vector[n] - np.sum(ens_vector[:, n])/EN)**2
 
     return BS
