@@ -4,7 +4,7 @@ import numpy as np
 @nb.njit()
 def score_bootstrap_1d(data, bootstrap_n=100):
     '''
-    Bootstrapping the last dimension of an array.
+    Bootstrapping all dimensions EXCEPT the last dimension of an array.
     
     Can be applied for the bootstrap replication of metrics.
     '''
