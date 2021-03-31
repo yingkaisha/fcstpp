@@ -64,6 +64,12 @@ def sg2d (z, window_size, order, derivative=None):
     m = np.linalg.pinv(A)[0].reshape((window_size, -1))
     return scipy.signal.fftconvolve(Z, m, mode='valid')
 
+def min_max_norm(data):
+    '''
+    Min-max normalization, accepts NaNs
+    '''
+    return (data-np.nanmin(data))/(np.nanmax(data)-np.nanmin(data))
+
 @nb.njit()
 def score_bootstrap_1d(data, bootstrap_n=100):
     '''
