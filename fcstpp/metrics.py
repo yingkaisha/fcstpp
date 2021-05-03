@@ -7,19 +7,25 @@ from fcstpp.utils import *
 
 
 def ETS(TRUE, PRED):
+    '''
+    Computing Equitable Threat Score (ETS) from binary input and target.
+    '''
     TN, FP, FN, TP = confusion_matrix(TRUE, PRED).ravel()
     TP_rnd = (TP+FN)*(TP+FP)/(TN+FP+FN+TP)
     return (TP-TP_rnd)/(TP+FN+FP-TP_rnd)
 
 def freq_bias(TRUE, PRED):
+    '''
+    Computing frequency bias from binary input and target.
+    '''
     TN, FP, FN, TP = confusion_matrix(TRUE, PRED).ravel()
     return (TP+FP)/(TP+FN)
 
-@nb.njit()
+#@nb.njit()
 def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
     '''
     (experimental)
-    Given quantile bins and values, compute CRPS based on determinstic obs.
+    Given quantile bins and values, computing CRPS from determinstic obs.
     
     Input
     ----------
@@ -32,7 +38,6 @@ def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
     ----------
         CRPS
         
-    * `q_bins` must be equally spaced.
     * `y_true` is 2-d. That said, one CDF paired for multiple obs.
       This is commonly applied for climatology CDFs vs. real-time obs. 
     
@@ -56,8 +61,9 @@ def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
                 
             H_func[:] = 0.0
             H_func[step:] = 1.0
-
-            CRPS[day, n] = np.sum(0.01*np.abs(q_bins-H_func))
+            
+            CRPS[day, n] = np.trapz((q_bins-H_func)**2, x=cdf)
+            #np.sum(np.diff(cdf)*(np.abs(q_bins-H_func)[:-1]))
     
     return CRPS
 
