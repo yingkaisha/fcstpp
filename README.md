@@ -1,6 +1,6 @@
 # Ensemble forecast post-processing (fcstpp)
 
-A collection of ensemble forecast post-processing functions.
+A scalable toolbox for ensemble forecast post-processing and verification.
 
 | `fcstpp.gridpp`| Usage | Reference |
 |:------------------|:--------------------------|:----------------|
