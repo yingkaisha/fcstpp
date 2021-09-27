@@ -21,6 +21,24 @@ def freq_bias(TRUE, PRED):
     TN, FP, FN, TP = confusion_matrix(TRUE, PRED).ravel()
     return (TP+FP)/(TP+FN)
 
+def PIT_nan(fcst, obs, q_bins):
+    '''
+    Probability Integral Transform (PIT) of observations based on forecast
+    '''
+    obs = obs[~np.isnan(obs)]
+    
+    # CDF_fcst
+    cdf_fcst = np.quantile(fcst, q_bins)
+    
+    # transforming obs to CDF_fcst 
+    n_obs = np.searchsorted(cdf_fcst, obs)
+    # an uniform distributed random variale
+    p_obs = n_obs/len(q_bins)
+    # estimate CDF_fcst(obs)
+    p_bins = np.quantile(p_obs, q_bins)
+    
+    return p_bins
+
 #@nb.njit()
 def CRPS_1d_from_quantiles(q_bins, CDFs, y_true):
     '''
